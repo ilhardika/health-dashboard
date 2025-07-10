@@ -1,25 +1,11 @@
 {
-  "version": 2,
   "buildCommand": "npm run build",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/api/app.js"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "VERCEL": "1"
-  },
   "functions": {
     "api/app.js": {
       "maxDuration": 30
     }
+  },
+  "env": {
+    "NODE_ENV": "production"
   }
 }
