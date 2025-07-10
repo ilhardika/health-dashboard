@@ -43,8 +43,13 @@ async function setupApp() {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    console.error("Express error:", err);
     res.status(status).json({ message });
-    throw err;
+
+    // Don't throw in production to prevent crashes
+    if (process.env.NODE_ENV !== "production") {
+      throw err;
+    }
   });
 
   // importantly only setup vite in development and after
@@ -59,8 +64,32 @@ async function setupApp() {
   return { app, server };
 }
 
+// Initialize app for both Vercel and local
+let appInitialized = false;
+
+async function initializeApp() {
+  if (appInitialized) return app;
+
+  try {
+    await setupApp();
+    appInitialized = true;
+    return app;
+  } catch (error) {
+    console.error("Failed to initialize app:", error);
+    throw error;
+  }
+}
+
 // For Vercel serverless deployment
-export default app;
+export default async function handler(req: any, res: any) {
+  try {
+    const initializedApp = await initializeApp();
+    return initializedApp(req, res);
+  } catch (error) {
+    console.error("Handler error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
 
 // For local development
 if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
@@ -76,7 +105,4 @@ if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
       log(`serving on ${host}:${port}`);
     });
   })();
-} else {
-  // Initialize app for Vercel
-  setupApp();
 }

@@ -1,4 +1,4 @@
 // This file serves as the entry point for Vercel serverless deployment
-import app from '../dist/index.js';
+import handler from "../dist/index.js";
 
-export default app;
+export default handler;
