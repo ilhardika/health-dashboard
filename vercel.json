@@ -3,7 +3,7 @@
   "buildCommand": "npm run build",
   "builds": [
     {
-      "src": "api/app.js",
+      "src": "package.json",
       "use": "@vercel/node"
     }
   ],
